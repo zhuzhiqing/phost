@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/addFile.png</file>
+        <file>images/audio.ico</file>
+        <file>images/audio.png</file>
+        <file>images/eject.png</file>
+        <file>images/eject.xcf</file>
+        <file>images/mute.png</file>
+        <file>images/pause.png</file>
+        <file>images/play.png</file>
+        <file>images/reload.png</file>
+        <file>images/seekBackward.png</file>
+        <file>images/seekForward.png</file>
+        <file>images/skipBackward.png</file>
+        <file>images/skipForward.png</file>
+        <file>images/stop.png</file>
+        <file>images/video.png</file>
+        <file>images/video-display.png</file>
+        <file>images/volume.png</file>
+    </qresource>
+</RCC>

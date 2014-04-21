@@ -24,9 +24,11 @@ CVideoPlay::CVideoPlay(QWidget *parent) :
     mPlayState = false;
     mMuteFlag = false;
 
+    //ui icon set
+    ui->btnPlay->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+
     pmTimer = new QTimer(this);
     connect(pmTimer,SIGNAL(timeout()),this,SLOT(get_time_slots()));
-    pmTimer->start(1000);
     connect(pmProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(action_triggered()));
 
 }
@@ -52,44 +54,51 @@ void CVideoPlay::on_btnScan_clicked()
     }
 }
 
-
 void CVideoPlay::on_btnPlay_clicked()
 {
-    QStringList cmd_list;
+    if(pmProcess->Running)
+    {
+        if(mMediaFile.isEmpty())
+        {
+            int totalCount = ui->listWidgets->count();
+            if(totalCount < 1)
+            {
+                on_btnScan_clicked();
+            }
+            ui->listWidgets->setCurrentItem(ui->listWidgets->item(0),
+                                            QItemSelectionModel::Select);
+            ui->listWidgets->setItemSelected(ui->listWidgets->item(0),
+                                             true);
+            mMediaFile = PATH+ui->listWidgets->currentItem()->text();
+            play();
+        }
+        else
+        {
+            if(mPlayState)
+            {
+                mPlayState = false;
+                pmTimer->stop();
+                ui->btnPlay->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+                pmProcess->write("pause\n");
+            }
+            else
+            {
+                mPlayState = true;
+                pmProcess->write("play\n");
+                pmProcess->write("get_time_length\n");
+                ui->btnPlay->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
+                pmTimer->start(1000);
 
-    cmd_list<<"-wid";
-    cmd_list<<QString::number(ui->widget->winId());
-    cmd_list<<"-slave";
-    cmd_list<<"-quiet";
-
-    pmProcess->start(mPlayer, cmd_list);
-    pmProcess->write("get_time_length\n");
-    pmTimer->start(1000);
-
+            }
+        }
+    }
 
 }
 
 void CVideoPlay::on_listWidgets_itemDoubleClicked(QListWidgetItem *item)
 {
-    QString filename = item->text();
-
-    mMediaFile = PATH+filename;
-    QStringList cmd_list;
-    cmd_list << mMediaFile;
-    cmd_list << "-wid";
-    cmd_list << QString ::number(ui->widget->winId());
-    cmd_list << "-slave";
-    cmd_list << "-quiet";
-    if(pmProcess->Running)
-    {
-        pmProcess->kill();
-        pmProcess->waitForFinished(WAIT_FOR_FINISH_TIME);
-
-    }
-
-    pmProcess->start(mPlayer , cmd_list);
-    pmTimer->start(1000);
-    pmProcess->write("get_time_length\n");
+    mMediaFile = PATH + item->text();
+    play();
 }
 
 void CVideoPlay::action_triggered()
@@ -97,7 +106,6 @@ void CVideoPlay::action_triggered()
     while(pmProcess->canReadLine())
     {
         QString message(pmProcess->readLine());
-        qDebug()<<message;
 
         QStringList message_list=message.split("=");
         if(message_list[0]=="ANS_TIME_POSITION")
@@ -106,14 +114,15 @@ void CVideoPlay::action_triggered()
             QTime time = int_to_time(mCurrTime);
             ui->labelPos->setText(time.toString("hh:mm:ss"));
             ui->sldProgress->setValue(100*mCurrTime/mTotalTime);
-            qDebug()<<time.toString("hh:mm:ss");
+         //   qDebug()<<"time_stamp:"<<time.toString("hh:mm:ss");
 
         }
-        else if(message_list[0]=="ANS_LEHGTH")
+        else if(message_list[0]=="ANS_LENGTH")
         {
             mTotalTime = message_list[1].toDouble();
             QTime time = int_to_time(mTotalTime);
             ui->labelTotal->setText(time.toString("hh:mm:ss"));
+       //     qDebug()<<"total_time:"<<time.toString("hh:mm:ss");
         }
     }
 }
@@ -151,11 +160,10 @@ QTime CVideoPlay::int_to_time(int second)
 
 void CVideoPlay::get_time_slots()
 {
-//    qDebug("__get_time_slots__");
-//    if(pmProcess->waitForStarted())
-//    {
-//        pmProcess->write("get_time_pos\n");
-//    }
+    if(pmProcess->waitForStarted())
+    {
+        pmProcess->write("get_time_pos\n");
+    }
 }
 
 void CVideoPlay::on_btnForward_clicked()
@@ -203,11 +211,9 @@ void CVideoPlay::on_sldProgress_actionTriggered(int action)
         if(pmTimer->isActive())
         {
             pmTimer->stop();
-            pmProcess->write("pause\n");
             //获取进度条的增加值
             curvalue(ui->sldProgress->value());
             pmTimer->start(1000);
-            pmProcess->write("pause\n");
         }
         else
         {
@@ -221,20 +227,93 @@ void CVideoPlay::curvalue(int val)
     pmProcess->write("pause\n");
     int targetValue = val;
     QString str1 = "seek ";
-    QString str2 = " 1\n";
+    QString str2 = " \n";
     QString tempStr = str1 + QString::number(targetValue) + str2;
-    //const char *str = tempStr.toAscii();
-    pmProcess->write("pause\n");
-   // pmProcess->write(str);
+    const char *str = qPrintable(tempStr);//.toAscii();
+    pmProcess->write(str);
+    pmProcess->write("play\n");
 }
 
 
 void CVideoPlay::on_btnPrevious_clicked()
 {
-
+    int currow = ui->listWidgets->currentRow();
+    int totalCount = ui->listWidgets->count();
+    if(totalCount > 1)
+    {
+        if(currow != 0)
+        {
+            ui->listWidgets->setCurrentItem(ui->listWidgets->item(currow-1),
+                                            QItemSelectionModel::Select);
+            ui->listWidgets->setItemSelected(ui->listWidgets->item(currow-1),
+                                             true);
+        }
+        else
+        {
+            ui->listWidgets->setCurrentItem(ui->listWidgets->item(0),
+                                            QItemSelectionModel::Select);
+            ui->listWidgets->setItemSelected(ui->listWidgets->item(0),
+                                             true);
+        }
+        mMediaFile = PATH+ui->listWidgets->currentItem()->text();
+        play();
+    }
 }
 
 void CVideoPlay::on_btnNext_clicked()
 {
+    int currow = ui->listWidgets->currentRow();
+    int totalCount = ui->listWidgets->count();
+    if(totalCount > 1)
+    {
+        if( (currow+1) != totalCount)
+        {
+            ui->listWidgets->setCurrentItem(ui->listWidgets->item(currow+1),
+                                            QItemSelectionModel::Select);
+            ui->listWidgets->setItemSelected(ui->listWidgets->item(currow+1),
+                                             true);
+        }
+        else
+        {
+            ui->listWidgets->setCurrentItem(ui->listWidgets->item(0),
+                                            QItemSelectionModel::Select);
+            ui->listWidgets->setItemSelected(ui->listWidgets->item(0),
+                                             true);
+        }
+        mMediaFile = PATH+ui->listWidgets->currentItem()->text();
+        play();
+    }
+}
 
+void CVideoPlay::play()
+{
+    mPlayState = true;
+    ui->btnPlay->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
+    QStringList cmd_list;
+    cmd_list<< mMediaFile;
+    cmd_list<<"-wid";
+    cmd_list<<QString::number(ui->widget->winId());
+    cmd_list<<"-slave";
+    cmd_list<<"-quiet > /dev/fb2";
+ //   cmd_list<<"-af volume=-10 -softvol -softvol-max 100";
+
+    if(pmProcess->Running)
+    {
+        pmProcess->kill();
+        pmProcess->waitForFinished(WAIT_FOR_FINISH_TIME);
+    }
+    pmProcess->start(mPlayer,cmd_list);
+    pmTimer->start(1000);
+    pmProcess->write("get_time_length\n");
+}
+
+void CVideoPlay::stop()
+{
+    mPlayState = false;
+    ui->btnPlay->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    if(pmProcess->Running)
+    {
+        pmProcess->kill();
+        pmProcess->waitForFinished(WAIT_FOR_FINISH_TIME);
+    }
 }

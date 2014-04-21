@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CVideoPlay</class>
+ <widget class="QDialog" name="CVideoPlay">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>790</width>
+    <height>440</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QWidget" name="verticalLayoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>541</width>
+     <height>321</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="QWidget" name="widget" native="true"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxMutex">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>390</y>
+     <width>51</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset resource="player.qrc">
+     <normaloff>:/images/volume.png</normaloff>:/images/volume.png</iconset>
+   </property>
+  </widget>
+  <widget class="QSlider" name="sldVolume">
+   <property name="geometry">
+    <rect>
+     <x>530</x>
+     <y>350</y>
+     <width>29</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
+   </property>
+  </widget>
+  <widget class="QSplitter" name="splitter">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>338</y>
+     <width>491</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <widget class="QLabel" name="labelPos">
+    <property name="text">
+     <string>00:00:00</string>
+    </property>
+   </widget>
+   <widget class="QSlider" name="sldProgress">
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelTotal">
+    <property name="text">
+     <string>00:00:00</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QSplitter" name="splitter_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>386</y>
+     <width>441</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <widget class="QPushButton" name="btnPrevious">
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="player.qrc">
+      <normaloff>:/images/skipBackward.png</normaloff>:/images/skipBackward.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnBackward">
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="player.qrc">
+      <normaloff>:/images/seekBackward.png</normaloff>:/images/seekBackward.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnPlay">
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="player.qrc">
+      <normaloff>:/images/stop.png</normaloff>:/images/stop.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnForward">
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="player.qrc">
+      <normaloff>:/images/seekForward.png</normaloff>:/images/seekForward.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnNext">
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="player.qrc">
+      <normaloff>:/images/skipForward.png</normaloff>:/images/skipForward.png</iconset>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="btnScan">
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>350</y>
+     <width>210</width>
+     <height>80</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>  scan__aa</string>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="listWidgets">
+   <property name="geometry">
+    <rect>
+     <x>574</x>
+     <y>20</y>
+     <width>201</width>
+     <height>321</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>22</pointsize>
+     <weight>75</weight>
+     <italic>true</italic>
+     <bold>true</bold>
+    </font>
+   </property>
+  </widget>
+ </widget>
+ <resources>
+  <include location="player.qrc"/>
+ </resources>
+ <connections/>
+</ui>
