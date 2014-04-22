@@ -1,5 +1,5 @@
 #include "widget.h"
-#include "cnetwork.h"
+#include "globalValue.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
@@ -15,8 +15,6 @@ int main(int argc, char *argv[])
 
     Widget w;
     w.show();
-    cnetwork network;
-    network.startServer();
-    
+
     return a.exec();
 }

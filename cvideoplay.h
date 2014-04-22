@@ -55,6 +55,10 @@ private slots:
 
     void on_btnNext_clicked();
 
+ public slots:
+    //network communication
+    void handleCtrl2VideoSignal();
+
 private:
     Ui::CVideoPlay *ui;
 

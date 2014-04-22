@@ -2,21 +2,21 @@
 #include <QTcpServer>
 #include <QDebug>
 
-cnetwork::cnetwork(QObject *parent) :
+CNetwork::CNetwork(QObject *parent) :
     QObject(parent)
 {
     mTcpConnectionSessionNum = 0;
     pmConnection = new CConnection[MAX_TCP_CONNECTION];
 }
 
-void cnetwork::showMessage(QString message)
+void CNetwork::showMessage(QString message)
 {
 #ifdef  DEBUG
     qDebug()<<message;
 #endif
 }
 
-bool cnetwork::startServer()
+bool CNetwork::startServer()
 {
     pmTcpServer = new QTcpServer(this);
     if(!pmTcpServer->listen(QHostAddress::Any,SERVER_PORT))
@@ -28,7 +28,7 @@ bool cnetwork::startServer()
     return true;
 }
 
-void cnetwork::handleNewConnection()
+void CNetwork::handleNewConnection()
 {
     int i = 0;
     for(i = 0; i < MAX_TCP_CONNECTION; i++)
@@ -65,7 +65,7 @@ void cnetwork::handleNewConnection()
 
 }
 
-void cnetwork::handNewMessage()
+void CNetwork::handNewMessage()
 {
     //get the connection which had received message.
     QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
@@ -74,9 +74,12 @@ void cnetwork::handNewMessage()
     //read
     QByteArray rcvMessage = socket->readAll();
     qDebug()<<socket<<rcvMessage;
+
+    if(rcvMessage.toInt()==1)
+        emit neworkCtrl2VideoSignal();
 }
 
-void cnetwork::handleDisconnected()
+void CNetwork::handleDisconnected()
 {
     //get the connection which disconnect from server.
     QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
@@ -99,16 +102,17 @@ void cnetwork::handleDisconnected()
     qDebug()<<"mTcpConnectionSessionNum:"<<mTcpConnectionSessionNum;
 }
 
-void cnetwork::handleSocketError()
+void CNetwork::handleSocketError()
 {
     qDebug()<<"socket error!";
     /*not realize !*/
 }
 
-void cnetwork::deleteConnection(int connectID)
+void CNetwork::deleteConnection(int connectID)
 {
     mConnectionMutex.lock();
     pmConnection[connectID].DeleteConnection();
     pmConnection[connectID].mStatus = false;
     mConnectionMutex.unlock();
 }
+

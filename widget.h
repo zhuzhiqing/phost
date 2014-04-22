@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include "cvideoplay.h"
-
+#include "cnetwork.h"
 namespace Ui {
 class Widget;
 }
@@ -15,6 +15,7 @@ class Widget : public QWidget
 public:
     explicit Widget(QWidget *parent = 0);
     ~Widget();
+    CNetwork *mpNetwork;
     
 private slots:
 
@@ -22,9 +23,16 @@ private slots:
 
     void on_showConnect_clicked();
 
+signals:
+    void ctrlMsg2Video();
+
+public slots:
+   //network communication
+//   void videoCtrolFromNet();
+
 private:
     Ui::Widget *ui;
-    CVideoPlay cVideoPlay;
+    CVideoPlay *cVideoPlay;
 };
 
 #endif // WIDGET_H

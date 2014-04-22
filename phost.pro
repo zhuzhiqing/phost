@@ -21,7 +21,7 @@ HEADERS  += widget.h \
     cvideoplay.h \
     constvaule.h \
     cnetwork.h \
-    cconnection.h
+    utils.h
 
 FORMS    += widget.ui \
     cvideoplay.ui

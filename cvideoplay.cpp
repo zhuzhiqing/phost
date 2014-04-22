@@ -12,7 +12,7 @@
 #include <QSlider>
 
 #include "constvaule.h"
-
+#include "globalValue.h"
 
 CVideoPlay::CVideoPlay(QWidget *parent) :
     QDialog(parent),
@@ -30,6 +30,14 @@ CVideoPlay::CVideoPlay(QWidget *parent) :
     pmTimer = new QTimer(this);
     connect(pmTimer,SIGNAL(timeout()),this,SLOT(get_time_slots()));
     connect(pmProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(action_triggered()));
+}
+
+void CVideoPlay::handleCtrl2VideoSignal()
+{
+    if(this->isVisible()){
+        on_btnScan_clicked();
+        on_btnPlay_clicked();
+    }
 
 }
 
@@ -294,7 +302,7 @@ void CVideoPlay::play()
     cmd_list<<"-wid";
     cmd_list<<QString::number(ui->widget->winId());
     cmd_list<<"-slave";
-    cmd_list<<"-quiet > /dev/fb2";
+    cmd_list<<"-quiet";
  //   cmd_list<<"-af volume=-10 -softvol -softvol-max 100";
 
     if(pmProcess->Running)
