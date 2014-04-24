@@ -1,4 +1,5 @@
 #include "cnetwork.h"
+#include "utils.h"
 #include <QTcpServer>
 #include <QDebug>
 
@@ -61,23 +62,133 @@ void CNetwork::handleNewConnection()
             return;
         }
     }
-
-
 }
 
 void CNetwork::handNewMessage()
 {
     //get the connection which had received message.
     QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
- //   CConnection* connection = qobject_cast<CConnection*>(socket->parent());
+    CConnection* connection = qobject_cast<CConnection*>(socket->parent());
 
-    //read
-    QByteArray rcvMessage = socket->readAll();
-    qDebug()<<socket<<rcvMessage;
+    readSessionMsg(connection);
 
-    if(rcvMessage.toInt()==1)
-        emit neworkCtrl2VideoSignal();
+    //判断是否需要发送消息
+    if (connection->rcvMsgList.last()->filledLength == connection->rcvMsgList.last()->length)
+    {
+        switch(connection->rcvMsgList.last()->type)
+        {
+        case MEDIA_CTRL:
+            emit neworkCtrl2VideoSignal((connection->rcvMsgList));
+            break;
+        default:
+            break;
+
+        }
+    }
 }
+
+void CNetwork::readSessionMsg(CConnection *session)
+{
+    int totalLen = session->pmTcpSocket->bytesAvailable();
+    QByteArray rcvMessage;
+    int readLen, bufferLeftLen;
+    CMessage *message;
+
+    //若一次受到数据小于9，则跳过读取，留着下次一起读取
+    if (totalLen > 9)
+    {
+        rcvMessage = session->pmTcpSocket->read(10);
+        totalLen -= 10;
+    }
+    else
+        return;
+
+    if (rcvMessage.count("NMSG"))       //new message
+    {
+        //第一次开始传输或上次传输完成，则开始新的消息
+        if (session->rcvMsgList.isEmpty() ||
+                (session->rcvMsgList.last()->filledLength == session->rcvMsgList.last()->length))
+        {
+            //创建新的message 对象,填充相关信息
+
+            message = new CMessage;
+            message->type = rcvMessage[4];
+            message->code = rcvMessage[5];
+            message->length = rcvMessage[6]
+                    | (rcvMessage[7]<<8)
+                    | (rcvMessage[8]<<16)
+                    | (rcvMessage[9]<<24);
+            message->content = new char[message->length];
+            session->rcvMsgList.append(message);
+
+            //填充buffer
+            while (totalLen != 0 )
+            {
+                bufferLeftLen = message->length - message->filledLength;
+                readLen = session->pmTcpSocket->read(message->content + message->filledLength
+                                           , bufferLeftLen );
+                message->filledLength += readLen;
+                totalLen -= readLen;
+
+                //判断是否已经填充满了
+                if ( bufferLeftLen == 0)
+                    break;
+            }
+
+            /*如果buffer已经填充完毕，但是套接字缓冲区未读取完毕，则递归调用本函数
+            4种情形:a.套接字缓冲区无剩余，buffer未填充满         函数返回
+                   b.套接字缓冲区有剩余，buffer未填充满         不可能发生
+                   c.套接字缓冲区有剩余，buffer填充满           递归调用
+                   d.套接字缓冲区无剩余，buffer填充满           函数返回
+            */
+            if( (totalLen != 0) && (bufferLeftLen == 0) )
+                readSessionMsg(session);
+            else
+                return;
+        }
+    }
+    else    //complete last message
+    {
+        //消息成员显示:本次数据第一次开始传输或上次传输完成
+        //表示出错，读取并丢弃本次数据
+        if (session->rcvMsgList.isEmpty() ||
+                (session->rcvMsgList.last()->filledLength == session->rcvMsgList.last()->length))
+        {
+            rcvMessage = session->pmTcpSocket->readAll();   //读取并丢弃本次数据
+        }
+        else
+        {
+            message = session->rcvMsgList.last();
+
+            //此处存在bug,若当前消息未填充的字节数小于9，则数组越界
+            //保存函数开头读取的9个字节
+            memcpy(message->content + message->filledLength,
+                   rcvMessage,10);
+            message->filledLength += 10;
+
+
+            //填充buffer
+            while (totalLen != 0 )
+            {
+                bufferLeftLen = message->length - message->filledLength;
+                readLen = session->pmTcpSocket->read(message->content + message->filledLength
+                                           , bufferLeftLen );
+                message->filledLength += readLen;
+                totalLen -= readLen;
+
+                //判断是否已经填充满了
+                if ( bufferLeftLen == 0)
+                    break;
+            }
+
+            if( (totalLen != 0) && (bufferLeftLen == 0) )
+                readSessionMsg(session);
+            else
+                return;
+        }
+    }
+}
+
 
 void CNetwork::handleDisconnected()
 {

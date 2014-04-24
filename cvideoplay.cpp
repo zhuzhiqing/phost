@@ -10,9 +10,7 @@
 #include <QStringList>
 #include <QTime>
 #include <QSlider>
-
 #include "constvaule.h"
-#include "globalValue.h"
 
 CVideoPlay::CVideoPlay(QWidget *parent) :
     QDialog(parent),
@@ -32,13 +30,17 @@ CVideoPlay::CVideoPlay(QWidget *parent) :
     connect(pmProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(action_triggered()));
 }
 
-void CVideoPlay::handleCtrl2VideoSignal()
+void CVideoPlay::handleCtrl2VideoSignal(QLinkedList<CMessage*> _message)
 {
+    //qDebug ()<<"message type:"<<message.takeFirst()->type;
+    CMessage *message = _message.takeFirst();
+    qDebug()<<"message type:"<<message->type;
+
     if(this->isVisible()){
         on_btnScan_clicked();
         on_btnPlay_clicked();
     }
-
+    //delete message
 }
 
 CVideoPlay::~CVideoPlay()

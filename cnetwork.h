@@ -5,6 +5,7 @@
 #include <QtNetwork>
 #include <QMutex>
 #include "constvaule.h"
+#include "utils.h"
 
 class CConnection : public QObject
 {
@@ -12,12 +13,14 @@ class CConnection : public QObject
 public:
     bool        mStatus;//-1 indicate the socket is invalid; else is the global id of the connection
     QTcpSocket* pmTcpSocket;
+    QLinkedList<CMessage*>  rcvMsgList;      //msg queue
 
 public:
     CConnection()
     {
         mStatus = false;
         pmTcpSocket = NULL;
+      //  rcvMsgList = new QLinkedList<CMessage*>;
     }
 
     ~CConnection()
@@ -26,6 +29,11 @@ public:
         {
             delete pmTcpSocket;
         }
+
+//        if (rcvMsgList != NULL)
+//        {
+//            delete rcvMsgList;
+//        }
     }
 
 public:
@@ -60,7 +68,7 @@ public:
     void deleteConnection(int connectID);
     
 signals:
-    void neworkCtrl2VideoSignal();
+    void neworkCtrl2VideoSignal(QLinkedList<CMessage*> message);
     
 public slots:
     void handleNewConnection();
@@ -73,10 +81,12 @@ public slots:
 
 private:
     QTcpServer  *pmTcpServer;
-    CConnection     *pmConnection;
+    CConnection *pmConnection;
     QMutex      mConnectionMutex;
     int         mTcpConnectionSessionNum;
 
+private:
+    void readSessionMsg(CConnection * session);
 
 };
 

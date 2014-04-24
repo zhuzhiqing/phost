@@ -15,7 +15,8 @@ TEMPLATE = app
 SOURCES += main.cpp\
         widget.cpp \
     cvideoplay.cpp \
-    cnetwork.cpp
+    cnetwork.cpp \
+    utils.cpp
 
 HEADERS  += widget.h \
     cvideoplay.h \

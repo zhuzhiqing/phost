@@ -1,7 +1,7 @@
 #include "widget.h"
 #include "ui_widget.h"
 #include <QDebug>
-#include "globalValue.h"
+
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Widget)
@@ -11,9 +11,10 @@ Widget::Widget(QWidget *parent) :
     mpNetwork = new CNetwork;
     cVideoPlay = new CVideoPlay;
     mpNetwork->startServer();
-    QObject::connect(mpNetwork, SIGNAL(neworkCtrl2VideoSignal()),cVideoPlay,SLOT(handleCtrl2VideoSignal()),Qt::QueuedConnection);
- //   QObject::connect(this, SIGNAL(ctrlMsg2Video()),cVideoPlay,SLOT(handleCtrlMsg2Video()),Qt::QueuedConnection);
- //   QObject::connect(mpNetwork, SIGNAL(neworkCtrlMsg()),this,SIGNAL(ctrlMsg2Video()),Qt::QueuedConnection);
+
+    qRegisterMetaType<QLinkedList<CMessage*> >("QLinkedList<CMessage*>");
+    QObject::connect(mpNetwork, SIGNAL(neworkCtrl2VideoSignal(QLinkedList<CMessage*> )),
+                     cVideoPlay,SLOT(handleCtrl2VideoSignal(QLinkedList<CMessage*> )),Qt::QueuedConnection);
 }
 
 Widget::~Widget()

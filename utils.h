@@ -1,46 +1,41 @@
 #ifndef UTILS_H
 #define UTILS_H
 #include <QObject>
+#include <QMutex>
+
+//enum MsgFrameStatus
+//{
+//    /****************define communicate state*************************/
+//    MSG_FRAME_EMPTY = 1,    //haven't receive data
+//    MSG_FRAME_FILLING,      //receive data, but not complete
+//    MSG_FRAME_READY,        //receive data, and complete,but not used
+//    MSG_FRAME_IN_USE
+//};
+
+
 class CMessage : public QObject
 {
     Q_OBJECT
 public:
-    int type;
-    int code;
-    int length;     //content length
-    QByteArrayData *content;
-
+    char     type;
+    char     code;
+    int     length;     //content length
+    int     filledLength; //the count that has filled
+    char    *content;
+    int     status;
+    QMutex  mutex;
 public:
-    CMessage()
-    {
-        content = NULL;
-    }
+    CMessage();
 
-    ~CMessage()
-    {
-        if (content!=NULL)
-        {
-            delete content;
-        }
-    }
+    ~CMessage();
 
-public:
+    void InitializeMsg(char _type,char _code,int _length,char *_content);
 
-    void InitializeConnection(int _type,int _code,int _length,QByteArrayData *_content)
-    {
-        type = _type;
-        code = _code;
-        length = _length;
-        content = _content;
-        content->setParent(this);
-    }
+    void DeleteMsg();
 
-    void DeleteConnection()
-    {
-        delete content;
-        content = NULL;
-    }
 };
+
+
 
 
 #endif // UTILS_H

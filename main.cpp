@@ -1,6 +1,11 @@
 #include "widget.h"
-#include "globalValue.h"
+#include "utils.h"
 #include <QApplication>
+
+//static CMessage gMessageList[][MSG_FRAME_LIST_LENGTH];
+
+//static CMessage*
+
 
 int main(int argc, char *argv[])
 {

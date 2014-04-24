@@ -11,6 +11,9 @@
 #include <QMouseEvent>
 #include <QThread>
 #include <QTextCodec>
+#include <QLinkedList>
+
+#include "utils.h"
 
 
 
@@ -57,7 +60,7 @@ private slots:
 
  public slots:
     //network communication
-    void handleCtrl2VideoSignal();
+    void handleCtrl2VideoSignal(QLinkedList<CMessage*> message);
 
 private:
     Ui::CVideoPlay *ui;
