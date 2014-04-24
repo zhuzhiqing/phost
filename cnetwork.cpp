@@ -78,7 +78,7 @@ void CNetwork::handNewMessage()
         switch(connection->rcvMsgList.last()->type)
         {
         case MEDIA_CTRL:
-            emit neworkCtrl2VideoSignal((connection->rcvMsgList));
+            emit neworkCtrl2VideoSignal((connection));
             break;
         default:
             break;

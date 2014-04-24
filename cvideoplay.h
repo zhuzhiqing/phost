@@ -14,6 +14,7 @@
 #include <QLinkedList>
 
 #include "utils.h"
+#include "cnetwork.h"
 
 
 
@@ -60,7 +61,7 @@ private slots:
 
  public slots:
     //network communication
-    void handleCtrl2VideoSignal(QLinkedList<CMessage*> message);
+    void handleCtrl2VideoSignal( CConnection * _connection);
 
 private:
     Ui::CVideoPlay *ui;

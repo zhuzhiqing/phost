@@ -12,9 +12,9 @@ Widget::Widget(QWidget *parent) :
     cVideoPlay = new CVideoPlay;
     mpNetwork->startServer();
 
-    qRegisterMetaType<QLinkedList<CMessage*> >("QLinkedList<CMessage*>");
-    QObject::connect(mpNetwork, SIGNAL(neworkCtrl2VideoSignal(QLinkedList<CMessage*> )),
-                     cVideoPlay,SLOT(handleCtrl2VideoSignal(QLinkedList<CMessage*> )),Qt::QueuedConnection);
+    qRegisterMetaType< CConnection * >("CConnection *");
+    QObject::connect(mpNetwork, SIGNAL(neworkCtrl2VideoSignal(CConnection *)),
+                     cVideoPlay,SLOT(handleCtrl2VideoSignal(CConnection *)),Qt::QueuedConnection);
 }
 
 Widget::~Widget()

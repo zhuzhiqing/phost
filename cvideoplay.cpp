@@ -30,10 +30,13 @@ CVideoPlay::CVideoPlay(QWidget *parent) :
     connect(pmProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(action_triggered()));
 }
 
-void CVideoPlay::handleCtrl2VideoSignal(QLinkedList<CMessage*> _message)
+void CVideoPlay::handleCtrl2VideoSignal(CConnection * _connection)
 {
     //qDebug ()<<"message type:"<<message.takeFirst()->type;
-    CMessage *message = _message.takeFirst();
+   // CMessage *message = _message.takeFirst();
+   // qDebug()<<"message type:"<<message->type;
+    CConnection * connection = _connection;
+    CMessage *message = connection->rcvMsgList.takeFirst();
     qDebug()<<"message type:"<<message->type;
 
     if(this->isVisible()){

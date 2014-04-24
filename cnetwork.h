@@ -68,7 +68,8 @@ public:
     void deleteConnection(int connectID);
     
 signals:
-    void neworkCtrl2VideoSignal(QLinkedList<CMessage*> message);
+  //  void neworkCtrl2VideoSignal(QLinkedList<CMessage*>);
+     void neworkCtrl2VideoSignal(CConnection *);
     
 public slots:
     void handleNewConnection();
